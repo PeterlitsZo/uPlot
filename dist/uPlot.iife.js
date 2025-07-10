@@ -5870,6 +5870,8 @@ var uPlot = (function () {
 			hasSelect && chgSelect && setSelect(select);
 
 			if (drag.setScale && hasSelect && chgSelect) {
+				console.log("DRAG END");
+
 			//	if (syncKey != null) {
 			//		dragX = drag.x;
 			//		dragY = drag.y;
