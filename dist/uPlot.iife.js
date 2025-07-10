@@ -4526,6 +4526,8 @@ var uPlot = (function () {
 				// if we're using index positions, force first tick to match passed index
 				let forceMin = scale.distr == 2;
 
+				// READNOTE (PeterlitsZo): Maybe _splits is calculated at here?
+				console.log("[DEBUG] Maybe _splits is calculated here", { i, min, max, _incr, _space, forceMin });
 				let _splits = axis._splits = axis.splits(self, i, min, max, _incr, _space, forceMin);
 
 				// tick labels
@@ -4656,6 +4658,7 @@ var uPlot = (function () {
 
 				let lineHeight = axis.font[1] * axis.lineGap;
 
+				console.log("[DEBUG]", { _splits });
 				let canOffs = _splits.map(val => pxRound(getPos(val, scale, plotDim, plotOff)));
 
 				let _values = axis._values;
