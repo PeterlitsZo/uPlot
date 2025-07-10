@@ -1038,6 +1038,8 @@ declare namespace uPlot {
 
 			/** line color */
 			stroke?: Stroke;
+			/** line color, but for zero value. */
+			zeroStroke?: Stroke;
 
 			/** line width in CSS pixels */
 			width?: number;

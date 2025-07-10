@@ -3775,10 +3775,11 @@ var uPlot = (function () {
 				axis.incrs  = fnOrSelf(axis.incrs  || (          sc.distr == 2 ? wholeIncrs : (isTime ? (ms == 1 ? timeIncrsMs : timeIncrsS) : numIncrs)));
 				axis.splits = fnOrSelf(axis.splits || (isTime && sc.distr == 1 ? _timeAxisSplits : sc.distr == 3 ? logAxisSplits : sc.distr == 4 ? asinhAxisSplits : numAxisSplits));
 
-				axis.stroke        = fnOrSelf(axis.stroke);
-				axis.grid.stroke   = fnOrSelf(axis.grid.stroke);
-				axis.ticks.stroke  = fnOrSelf(axis.ticks.stroke);
-				axis.border.stroke = fnOrSelf(axis.border.stroke);
+				axis.stroke          = fnOrSelf(axis.stroke);
+				axis.grid.stroke     = fnOrSelf(axis.grid.stroke);
+				axis.grid.zeroStroke = axis.grid.zeroStroke == null ? axis.grid.stroke : fnOrSelf(axis.grid.zeroStroke);
+				axis.ticks.stroke    = fnOrSelf(axis.ticks.stroke);
+				axis.border.stroke   = fnOrSelf(axis.border.stroke);
 
 				let av = axis.values;
 
@@ -4454,7 +4455,11 @@ var uPlot = (function () {
 
 			pxAlign == 1 && ctx.translate(offset, offset);
 
-			setCtxStyle(stroke, width, dash, cap, stroke);
+			if (typeof stroke == "object" /* Now it has two field: "default" and "zero" */) {
+				setCtxStyle(stroke.default, width, dash, cap, stroke.default);
+			} else {
+				setCtxStyle(stroke, width, dash, cap, stroke);
+			}
 
 			ctx.beginPath();
 
@@ -4471,13 +4476,26 @@ var uPlot = (function () {
 
 			for (let i = 0; i < offs.length; i++) {
 				if (filts[i] != null) {
+					const drawZeroLine = (offs[i].isZero && typeof stroke == "object");
+					if (drawZeroLine) {
+						ctx.stroke();
+						ctx.beginPath();
+						setCtxStyle(stroke.zero, width, dash, cap, stroke.zero);
+					}
+
 					if (ori == 0)
-						x0 = x1 = offs[i];
+						x0 = x1 = offs[i].value;
 					else
-						y0 = y1 = offs[i];
+						y0 = y1 = offs[i].value;
 
 					ctx.moveTo(x0, y0);
 					ctx.lineTo(x1, y1);
+
+					if (drawZeroLine) {
+						ctx.stroke();
+						ctx.beginPath();
+						setCtxStyle(stroke.default, width, dash, cap, stroke.default);
+					}
 				}
 			}
 
@@ -4658,8 +4676,11 @@ var uPlot = (function () {
 
 				let lineHeight = axis.font[1] * axis.lineGap;
 
-				console.log("[DEBUG]", { _splits });
-				let canOffs = _splits.map(val => pxRound(getPos(val, scale, plotDim, plotOff)));
+				let canOffs = _splits.map(val => ({
+					isZero: val === 0,
+					value: pxRound(getPos(val, scale, plotDim, plotOff)),
+				}));
+				console.log("[DEBUG]", { _splits, canOffs });
 
 				let _values = axis._values;
 
@@ -4668,9 +4689,9 @@ var uPlot = (function () {
 
 					if (val != null) {
 						if (ori == 0)
-							x = canOffs[i];
+							x = canOffs[i].value;
 						else
-							y = canOffs[i];
+							y = canOffs[i].value;
 
 						val = "" + val;
 
@@ -4713,14 +4734,15 @@ var uPlot = (function () {
 
 				if (grid.show) {
 					drawOrthoLines(
-						canOffs,
+						canOffs ,
 						grid.filter(self, splits, i, _space, incr),
 						ori,
 						ori == 0 ? 2 : 1,
 						ori == 0 ? plotTop : plotLft,
 						ori == 0 ? plotHgt : plotWid,
 						roundDec(grid.width * pxRatio$1, 3),
-						grid.stroke(self, i),
+						
+						{ default: grid.stroke(self, i), zero: grid.zeroStroke(self, i) },
 						grid.dash,
 						grid.cap,
 					);
@@ -4728,7 +4750,7 @@ var uPlot = (function () {
 
 				if (border.show) {
 					drawOrthoLines(
-						[basePos],
+						[{ value: basePos, isZero: false }],
 						[1],
 						ori == 0 ? 1 : 0,
 						ori == 0 ? 1 : 2,
