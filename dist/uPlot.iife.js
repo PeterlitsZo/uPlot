@@ -5870,8 +5870,6 @@ var uPlot = (function () {
 			hasSelect && chgSelect && setSelect(select);
 
 			if (drag.setScale && hasSelect && chgSelect) {
-				console.log("DRAG END");
-
 			//	if (syncKey != null) {
 			//		dragX = drag.x;
 			//		dragY = drag.y;
@@ -5890,10 +5888,10 @@ var uPlot = (function () {
 				}
 
 				if (dragX) {
-					_setScale(xScaleKey,
-						posToVal(xOff, xScaleKey),
-						posToVal(xOff + xDim, xScaleKey)
-					);
+					const min = posToVal(xOff, xScaleKey);
+					const max = posToVal(xOff + xDim, xScaleKey);
+					// _setScale(xScaleKey, min, max);
+					fire("dragXEnd", min, max);
 				}
 
 				if (dragY) {

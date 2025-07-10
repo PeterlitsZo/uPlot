@@ -1187,6 +1187,9 @@ declare namespace uPlot {
 
 			/** fires after .u-over's getBoundingClientRect() is called (due to scroll or resize events) */
 			syncRect?:   (self: uPlot, rect: DOMRect) => void;
+
+			/** fires after drag-X is done. */
+			dragXEnd?:   (self: uPlot, min: number, max: number) => void;
 		}
 
 		export type Arrays = {
