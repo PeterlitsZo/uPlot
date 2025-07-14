@@ -4545,7 +4545,7 @@ var uPlot = (function () {
 				let forceMin = scale.distr == 2;
 
 				// READNOTE (PeterlitsZo): Maybe _splits is calculated at here?
-				console.log("[DEBUG] Maybe _splits is calculated here", { i, min, max, _incr, _space, forceMin });
+				// console.log("[DEBUG] Maybe _splits is calculated here", { i, min, max, _incr, _space, forceMin });
 				let _splits = axis._splits = axis.splits(self, i, min, max, _incr, _space, forceMin);
 
 				// tick labels
@@ -4680,7 +4680,7 @@ var uPlot = (function () {
 					isZero: val === 0,
 					value: pxRound(getPos(val, scale, plotDim, plotOff)),
 				}));
-				console.log("[DEBUG]", { _splits, canOffs });
+				// console.log("[DEBUG]", { _splits, canOffs });
 
 				let _values = axis._values;
 
